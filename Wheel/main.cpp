@@ -11,7 +11,7 @@
 #include <GLUT/GLUT.h>
 #include <cmath>
 
-double cameraHeight = 150.0;
+double cameraHeight = 80.0;
 double cameraAngle  = 1.0;
 
 class Point{
@@ -33,10 +33,7 @@ public:
         this->y = p.y ;
         this->z = p.z ;
     }
-    void print(){
-        printf("(%lf,%lf,%lf)\n\n",x,y,z) ;
-    }
-} pos,r,u,l ;
+} pos ;
 
 void drawAxes(){
     glPushMatrix();
@@ -78,12 +75,45 @@ void drawGrid()
         }glEnd();
 }
 
+void drawCircle(double radius,int segments,int z)
+{
+    int i;
+    double pi = acos(-1.0) ;
+    Point points[100];
+    glColor3f(0.7,0.7,0.7);
+    //generate points
+    for(i=0;i<=segments;i++)
+    {
+        points[i].x= pos.x + radius*cos(((double)i/(double)segments)*2*pi);
+        points[i].y= pos.y + radius*sin(((double)i/(double)segments)*2*pi);
+    }
+    //draw segments using generated points
+    for(i=0;i<segments;i++)
+    {
+        glBegin(GL_LINES);
+        {
+            glVertex3f(points[i].x,points[i].y,pos.z+z);
+            glVertex3f(points[i+1].x,points[i+1].y,pos.z+z);
+        }
+        glEnd();
+    }
+}
+
+void wheel(double height){
+
+    glPushMatrix() ;
+    glRotatef(90, 0,1,0) ;
+    for(double i=0;i<=height ;i+= 0.005){
+        glColor3f(1, 0, 0) ;
+        drawCircle(20,50,i) ;
+    }
+    glPopMatrix() ;
+}
+
+
+
 void init(){
-    pos = Point(100,100,100) ;
-    u = Point(0,0,1) ; //z axis is up vector
-    l = Point(-1/(sqrt(2)),-1/sqrt(2),0) ;
-    r = Point(-1/(sqrt(2)),1/sqrt(2),0) ;
-    
+    pos = Point(-20,0,0) ;
     glClearColor(0,0,0,0) ;
     glMatrixMode(GL_PROJECTION) ;
     glLoadIdentity() ;
@@ -97,13 +127,14 @@ void display(){
     
     glMatrixMode(GL_MODELVIEW) ;
     glLoadIdentity() ;
-    gluLookAt(200*cos(cameraAngle), 200*sin(cameraAngle), cameraHeight,        0,0,0,        0,0,1);
+    gluLookAt(100*cos(cameraAngle), 100*sin(cameraAngle), cameraHeight,        0,0,0,        0,0,1);
     
     glMatrixMode(GL_MODELVIEW) ;
     
     glPushMatrix();
     drawAxes() ;
     drawGrid() ;
+    wheel(10) ;
     glPopMatrix();
     
     glutSwapBuffers() ;
@@ -113,6 +144,10 @@ void animate(){
 }
 void keyboardListener(unsigned char key,int x,int y){
     switch (key) {
+        case 'w':pos.y += 5 ;
+            break ;
+        case 's':pos.y -= 5 ;
+            break ;
         default:
             break;
     }
