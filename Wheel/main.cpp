@@ -13,9 +13,9 @@
 
 double cameraHeight = 80.0;
 double cameraAngle  = 1.0;
-double rotateAngle = 3 ;
-double forwardAngle = 3 ;
-double forwardLength = 0 ;
+double rotateAngle ;
+double forwardAngle ;
+double forwardLength ;
 double radius ;
 
 class Point{
@@ -85,17 +85,28 @@ void wheel(double radius,double height,int segments){
     glTranslatef(0,0,+radius);
     glRotatef(90,0,1,0) ;
     Point p[segments+2] ;
+    Point d[4] ;
     double angle ;
     double h = height / 2 ;
     for(int i=0;i<=segments;i++){
         angle = ((1.0*i)/(1.0*segments))*acos(-1.0)*2 ;
+        
+        if(i%8==0){
+            d[i/8].x = radius*cos(angle) ;
+            d[i/8].y = radius*sin(angle) ;
+            d[i/8].z = h/4 ;
+        }
+        
+        
         p[i].x = radius*cos(angle) ;
         p[i].y = radius*sin(angle) ;
         p[i].z = h/2 ;
     }
+    
     glTranslatef(0,forwardLength, 0) ;
     glPushMatrix() ;
     glRotatef(forwardAngle,0,0,1) ;
+    
     double shade = 0.0 ;
     for(int i=0;i<segments;i++){
         
@@ -121,6 +132,20 @@ void wheel(double radius,double height,int segments){
         
         glEnd() ;
     }
+    
+    //diameter gulo draw korte hobe
+    for(int i=0;i<2;i++){
+        shade=((double)i/(double)2);
+        
+        glColor3f(shade,shade,shade);
+        glBegin(GL_QUADS) ;
+        glVertex3f(d[i].x,d[i].y,d[i].z) ;
+        glVertex3f(d[i+2].x,d[i+2].y,d[i+2].z) ;
+        glVertex3f(d[i+2].x,d[i+2].y,-d[i+2].z) ;
+        glVertex3f(d[i].x,d[i].y,-d[i].z) ;
+        glEnd();
+    }
+    
     glPopMatrix() ;
     
     glPopMatrix() ;
@@ -130,6 +155,9 @@ void wheel(double radius,double height,int segments){
 
 void init(){
     radius = 15.0 ;
+    rotateAngle = 0 ;
+    forwardLength = 0 ;
+    forwardAngle = 0 ;
     glClearColor(0,0,0,0) ;
     glMatrixMode(GL_PROJECTION) ;
     glLoadIdentity() ;
@@ -150,7 +178,7 @@ void display(){
     glPushMatrix();
     drawAxes() ;
     drawGrid() ;
-    wheel(radius,12,30) ;
+    wheel(radius,12,31) ;
     glPopMatrix();
     
     glutSwapBuffers() ;
@@ -165,6 +193,10 @@ void keyboardListener(unsigned char key,int x,int y){
             break;
         case 's': forwardAngle += 15 ;
             forwardLength -= 2*acos(-1.0)*radius * (15.0/360.0) ;
+            break;
+        case 'a': rotateAngle += 5 ;
+            break;
+        case 'd': rotateAngle -= 5 ;
             break;
         default:
             break;
