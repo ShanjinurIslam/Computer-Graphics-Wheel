@@ -17,6 +17,8 @@ double rotateAngle ;
 double forwardAngle ;
 double forwardLength ;
 double radius ;
+bool forward ;
+double tem1=0,tem2=0 ;
 
 class Point{
 public:
@@ -103,10 +105,16 @@ void wheel(double radius,double height,int segments){
         p[i].z = h/2 ;
     }
     
-    glTranslatef(0,forwardLength, 0) ;
-    glPushMatrix() ;
-    glRotatef(forwardAngle,0,0,1) ;
+    if(forward){
+        glTranslatef(0,forwardLength, 0) ;
+        glRotatef(forwardAngle,0,0,1) ;
+    }
+    else{
+        glTranslatef(0,tem1, 0) ;
+        glRotatef(rotateAngle,1,0,0) ;
+    }
     
+    glPushMatrix() ;
     double shade = 0.0 ;
     for(int i=0;i<segments;i++){
         
@@ -145,7 +153,6 @@ void wheel(double radius,double height,int segments){
         glVertex3f(d[i].x,d[i].y,-d[i].z) ;
         glEnd();
     }
-    
     glPopMatrix() ;
     
     glPopMatrix() ;
@@ -158,6 +165,7 @@ void init(){
     rotateAngle = 0 ;
     forwardLength = 0 ;
     forwardAngle = 0 ;
+    forward = true ;
     glClearColor(0,0,0,0) ;
     glMatrixMode(GL_PROJECTION) ;
     glLoadIdentity() ;
@@ -188,15 +196,25 @@ void animate(){
 }
 void keyboardListener(unsigned char key,int x,int y){
     switch (key) {
-        case 'w': forwardAngle -= 15 ;
+        case 'w':
+            forward = true ;
+            forwardAngle -= 15 ;
             forwardLength += 2*acos(-1.0)*radius * (15.0/360.0) ;
+            tem1 = forwardLength ;
+            tem2 = forwardAngle ;
             break;
         case 's': forwardAngle += 15 ;
             forwardLength -= 2*acos(-1.0)*radius * (15.0/360.0) ;
+            tem1 = forwardLength ;
+            tem2 = forwardAngle ;
             break;
-        case 'a': rotateAngle += 5 ;
+        case 'a':
+            forward = false ;
+            rotateAngle += 5 ;
             break;
-        case 'd': rotateAngle -= 5 ;
+        case 'd':
+            forward = false ;
+            rotateAngle -= 5 ;
             break;
         default:
             break;
