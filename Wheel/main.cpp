@@ -92,38 +92,71 @@ void drawRectangle(double width,double height)
 }
 
 void wheel(double radius,int segments){
-    
     glPushMatrix() ;
     glTranslatef(0,0,+radius);
     glTranslatef(pos.x,pos.y,pos.z) ;
     glRotatef(rotateAngle,0,0,1) ;
-    glRotatef((distance/2*acos(-1.0)*radius)*360,0,1,0) ;
+    glRotatef(distance*(360.0/(2*3.1416*radius)),0,1,0) ;
     
-    double rectSize = 2*acos(-1.0)*radius/segments ;
+    Point p[segments+2] ;
+    Point d[4] ;
+    double angle ;
+    double h = radius / 2 ;
+    for(int i=0;i<=segments;i++){
+        angle = ((1.0*i)/(1.0*segments))*acos(-1.0)*2 ;
+        if(i%8==0){
+            d[i/8].x = radius*cos(angle) ;
+            d[i/8].y = radius*sin(angle) ;
+            d[i/8].z = h/4 ;
+        }
+        p[i].x = radius*cos(angle) ;
+        p[i].y = radius*sin(angle) ;
+        p[i].z = h/2 ;
+    }
     
     glPushMatrix() ;
-    double shade ;
-    for(int i=0;i<segments;i++) {
-        if(i<segments/2)    shade=((double)i/(double)segments);
-        else    shade=(1-(double)i/(double)segments);
-        double angle=360.0*(double)i/(double)segments;
-        glPushMatrix(); {
-            glColor3f(shade,shade,shade);
-            glRotatef(angle,0,1,0);
-            glTranslatef(radius,0,0);
-            glRotatef(90,0,1,0);
-            drawRectangle(rectSize,2.5*rectSize);
-        }
-        glPopMatrix();
-    }
-    glColor3f(.8,.8,.8);
-    drawRectangle(2*radius,rectSize);
-    glColor3f(.6,.6,.6);
-    glRotatef(90,0,1,0);
-    drawRectangle(2*radius,rectSize);
-    glPopMatrix();
+    glRotatef(90, 1,0,0) ;
     
-    glPopMatrix() ;
+        double shade = 0.0 ;
+        for(int i=0;i<segments;i++){
+            
+            if(i<segments/2)  shade=((double)i/(double)segments);
+            else  shade=(1-(double)i/(double)segments);
+            
+            glColor3f(shade,shade,shade);
+            
+            glBegin(GL_LINES) ;
+            
+            glVertex3f(p[i].x,p[i].y,p[i].z) ;
+            glVertex3f(p[i+1].x,p[i+1].y,p[i+1].z) ;
+            glVertex3f(p[i].x,p[i].y,-p[i].z) ;
+            glVertex3f(p[i+1].x,p[i+1].y,-p[i+1].z) ;
+            
+            glEnd() ;
+            
+            glBegin(GL_QUADS) ;
+            glVertex3f(p[i].x,p[i].y,p[i].z) ;
+            glVertex3f(p[i+1].x,p[i+1].y,p[i+1].z) ;
+            glVertex3f(p[i+1].x,p[i+1].y,-p[i+1].z) ;
+            glVertex3f(p[i].x,p[i].y,-p[i].z) ;
+            
+            glEnd() ;
+        }
+    
+        for(int i=0;i<2;i++){
+            shade=((double)i/(double)2);
+            
+            glColor3f(shade,shade,shade);
+            glBegin(GL_QUADS) ;
+            glVertex3f(d[i].x,d[i].y,d[i].z) ;
+            glVertex3f(d[i+2].x,d[i+2].y,d[i+2].z) ;
+            glVertex3f(d[i+2].x,d[i+2].y,-d[i+2].z) ;
+            glVertex3f(d[i].x,d[i].y,-d[i].z) ;
+            glEnd();
+        }
+        glPopMatrix() ;
+        
+        glPopMatrix() ;
 }
 
 
@@ -162,14 +195,14 @@ void animate(){
 void keyboardListener(unsigned char key,int x,int y){
     switch (key) {
         case 'w':
-            pos.x += 5*cos(rotateAngle*acos(-1.0)/180.0) ;
-            pos.y += 5*sin(rotateAngle*acos(-1.0)/180.0) ;
-            distance += 5 ;
+            pos.x += 2*cos(rotateAngle*acos(-1.0)/180.0) ;
+            pos.y += 2*sin(rotateAngle*acos(-1.0)/180.0) ;
+            distance += 2 ;
             break;
         case 's':
-            pos.x -= 5*cos(rotateAngle*acos(-1.0)/180.0) ;
-            pos.y -= 5*sin(rotateAngle*acos(-1.0)/180.0) ;
-            distance -= 5 ;
+            pos.x -= 2*cos(rotateAngle*acos(-1.0)/180.0) ;
+            pos.y -= 2*sin(rotateAngle*acos(-1.0)/180.0) ;
+            distance -= 2 ;
             break;
             break;
         case 'a':
