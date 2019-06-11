@@ -78,25 +78,13 @@ void drawGrid()
         }glEnd();
 }
 
-void drawRectangle(double width,double height)
-{
-    glPushMatrix();{
-        double x=width/2,y=height/2;
-        glBegin(GL_QUADS);{
-            glVertex3f(x,y,0);
-            glVertex3f(x,-y,0);
-            glVertex3f(-x,-y,0);
-            glVertex3f(-x,y,0);
-        }glEnd();
-    }glPopMatrix();
-}
-
 void wheel(double radius,int segments){
     glPushMatrix() ;
     glTranslatef(0,0,+radius);
     glTranslatef(pos.x,pos.y,pos.z) ;
     glRotatef(rotateAngle,0,0,1) ;
     glRotatef(distance*(360.0/(2*3.1416*radius)),0,1,0) ;
+    glRotatef(90, 1,0,0) ;
     
     Point p[segments+2] ;
     Point d[4] ;
@@ -115,7 +103,7 @@ void wheel(double radius,int segments){
     }
     
     glPushMatrix() ;
-    glRotatef(90, 1,0,0) ;
+    
     
         double shade = 0.0 ;
         for(int i=0;i<segments;i++){
@@ -184,7 +172,7 @@ void display(){
     glPushMatrix();
     drawAxes() ;
     drawGrid() ;
-    wheel(radius,30) ;
+    wheel(radius,31) ;
     glPopMatrix();
     
     glutSwapBuffers() ;
